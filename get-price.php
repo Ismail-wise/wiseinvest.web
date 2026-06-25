@@ -1,6 +1,7 @@
 <?php
 
 require_once 'includes/db.php';
+require_once 'includes/api_config.php';
 
 $symbol = $_GET['symbol'] ?? '';
 
@@ -9,18 +10,18 @@ echo json_encode(["price"=>0]);
 exit();
 }
 
-$api_key = "0cba35d6ffdb4e93b1a0424245157f44";
+$api_key = FINNHUB_API_KEY;
 
-$url = "https://api.twelvedata.com/price?symbol=$symbol&apikey=$api_key";
+$url = "https://finnhub.io/api/v1/quote?symbol=$symbol&token=$api_key";
 
 $response = file_get_contents($url);
 
 $data = json_decode($response,true);
 
-if(isset($data['price'])){
+if(isset($data['c']) && $data['c'] > 0){
 
 echo json_encode([
-"price"=>$data['price']
+"price"=>$data['c']
 ]);
 
 }else{
