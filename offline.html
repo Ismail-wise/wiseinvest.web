@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d4af37">
+  <title>Offline — WiseInvest</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #e2e8f0;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .container { max-width: 400px; width: 100%; }
+    .logo {
+      width: 96px; height: 96px;
+      border-radius: 20px;
+      border: 2px solid rgba(212,175,55,0.5);
+      margin: 0 auto 28px;
+      display: block;
+      box-shadow: 0 0 32px rgba(212,175,55,0.15);
+    }
+    .offline-icon {
+      font-size: 2.8rem;
+      margin-bottom: 20px;
+      opacity: 0.45;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #d4af37;
+      letter-spacing: -0.3px;
+      margin-bottom: 24px;
+    }
+    .msg-en {
+      font-size: 1rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .divider {
+      width: 40px; height: 2px;
+      background: rgba(212,175,55,0.35);
+      border-radius: 2px;
+      margin: 14px auto;
+    }
+    .msg-mm {
+      font-size: 0.95rem;
+      color: #64748b;
+      line-height: 1.9;
+      margin-bottom: 36px;
+    }
+    .btn-retry {
+      background: linear-gradient(135deg, #d4af37, #facc15);
+      color: #0a0a0a;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 36px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(212,175,55,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(212,175,55,0.6);
+    }
+    .btn-retry:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/icons/web-app-manifest-192x192.png" alt="WiseInvest Logo" class="logo">
+    <div class="offline-icon">&#128225;</div>
+    <h1>WiseInvest</h1>
+    <p class="msg-en">You're offline. Please check your internet connection.</p>
+    <div class="divider"></div>
+    <p class="msg-mm">သင် offline ဖြစ်နေပါသည်။ Internet connection ကို စစ်ဆေးပါ။</p>
+    <button class="btn-retry" onclick="window.location.reload()">Try Again</button>
+  </div>
+</body>
+</html>
