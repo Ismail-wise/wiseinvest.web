@@ -220,6 +220,47 @@ body.no-scroll { overflow: hidden; }
     z-index: 2;
 }
 
+/* Custom scrolling ticker (reads from get_ticker.php) */
+.ticker-track {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: max-content;
+    white-space: nowrap;
+    animation: tickerScroll 60s linear infinite;
+}
+.ticker-track:hover { animation-play-state: paused; }
+@keyframes tickerScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 22px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+.ticker-sym {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d4af37, #facc15);
+    color: #020617;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+.ticker-name  { color: #e2e8f0; font-weight: 500; }
+.ticker-price { color: #fff;    font-weight: 600; }
+.ticker-chg   { font-weight: 600; display: inline-flex; align-items: center; gap: 2px; }
+.ticker-chg.up   { color: #22c55e; }
+.ticker-chg.down { color: #ef4444; }
+
 /* ── Main bar ────────────────────────────────────────────────── */
 .main-bar {
     height: var(--header-height);
@@ -585,33 +626,62 @@ body.no-scroll { overflow: hidden; }
             <span class="ticker-label-text">Markets</span>
         </div>
         <div class="ticker-widget-wrap">
-            <div class="tradingview-widget-container" style="height:100%;">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-                {
-                    "symbols": [
-                        { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
-                        { "proName": "FOREXCOM:NSXUSD", "title": "US 100" },
-                        { "proName": "NASDAQ:AAPL",     "title": "Apple" },
-                        { "proName": "NASDAQ:TSLA",     "title": "Tesla" },
-                        { "proName": "NASDAQ:NVDA",     "title": "Nvidia" },
-                        { "proName": "NASDAQ:AMZN",     "title": "Amazon" },
-                        { "proName": "NASDAQ:MSFT",     "title": "Microsoft" },
-                        { "proName": "BINANCE:BTCUSDT", "title": "Bitcoin" },
-                        { "proName": "BINANCE:ETHUSDT", "title": "Ethereum" },
-                        { "proName": "TVC:GOLD",        "title": "Gold" },
-                        { "proName": "TVC:DXY",         "title": "USD Index" }
-                    ],
-                    "showSymbolLogo": true,
-                    "isTransparent": true,
-                    "displayMode": "adaptive",
-                    "colorTheme": "dark",
-                    "locale": "en"
-                }
-                </script>
-            </div>
+            <div class="ticker-track" id="tickerTrack"></div>
         </div>
     </div>
+
+    <!-- Custom ticker: live data from get_ticker.php -->
+    <script>
+    (function () {
+        'use strict';
+        var track = document.getElementById('tickerTrack');
+        if (!track) return;
+
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function buildItem(it) {
+            var sym     = (it.symbol || '').toString();
+            var name    = esc(it.name);
+            var price   = parseFloat(it.price)   || 0;
+            var percent = parseFloat(it.percent) || 0;
+            var up      = percent >= 0;
+
+            var item = document.createElement('span');
+            item.className = 'ticker-item';
+            item.innerHTML =
+                '<span class="ticker-sym">' + esc(sym.charAt(0) || '?') + '</span>' +
+                '<span class="ticker-name">' + name + '</span>' +
+                '<span class="ticker-price">$' + price.toFixed(2) + '</span>' +
+                '<span class="ticker-chg ' + (up ? 'up' : 'down') + '">' +
+                    (up ? '▲' : '▼') + ' ' + Math.abs(percent).toFixed(2) + '%' +
+                '</span>';
+            return item;
+        }
+
+        function render(data) {
+            track.innerHTML = '';
+            if (!Array.isArray(data) || data.length === 0) return;
+            var frag = document.createDocumentFragment();
+            // Build the list, then duplicate once for a seamless loop
+            data.forEach(function (it) { frag.appendChild(buildItem(it)); });
+            data.forEach(function (it) { frag.appendChild(buildItem(it)); });
+            track.appendChild(frag);
+        }
+
+        function load() {
+            fetch('/get_ticker.php')
+                .then(function (r) { return r.json(); })
+                .then(function (data) { render(data); })
+                .catch(function () { /* stay empty, never throw */ });
+        }
+
+        load();
+        setInterval(load, 60000);
+    }());
+    </script>
 
     <!-- MAIN NAV BAR -->
     <div class="main-bar">
