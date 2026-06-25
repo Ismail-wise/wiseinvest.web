@@ -1,2 +1,6 @@
 includes/api_config.php
 wiseinvest.zip
+
+config/keys.php
+error_log
+api/cache_*.json
